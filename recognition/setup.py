@@ -5,6 +5,12 @@ import os
 import uuid
 
 import cv2
+import numpy as np
+from tensorflow.image import stateless_random_brightness
+from tensorflow.image import stateless_random_contrast
+from tensorflow.image import stateless_random_flip_left_right
+from tensorflow.image import stateless_random_jpeg_quality
+from tensorflow.image import stateless_random_saturation
 
 from recognition.constants import ANCHOR_PATH, NEGATIVE_PATH, POSITIVE_PATH
 from recognition.constants import LABELED_FACES_PATH
@@ -65,6 +71,58 @@ def collect_pictures(device=0):
     cv2.destroyAllWindows()
 
 
+def create_augmented_pictures(picture):
+    new_pictures = []
+    for _ in range(5):
+        new_picture = stateless_random_brightness(
+            picture, max_delta=0.02, seed=(1, 2)
+        )
+        new_picture = stateless_random_contrast(
+            new_picture, upper=1, lower=0.6, seed=(1, 3)
+        )
+        new_picture = stateless_random_flip_left_right(
+            new_picture, seed=(np.random.randint(100), np.random.randint(100))
+        )
+        new_picture = stateless_random_jpeg_quality(
+            new_picture,
+            min_jpeg_quality=90,
+            max_jpeg_quality=100,
+            seed=(np.random.randint(100), np.random.randint(100)),
+        )
+        new_picture = stateless_random_saturation(
+            new_picture,
+            lower=0.9,
+            upper=1,
+            seed=(np.random.randint(100), np.random.randint(100)),
+        )
+
+        new_pictures.append(new_picture)
+
+    return new_pictures
+
+
+def apply_data_augmentation():
+    for image in os.listdir(ANCHOR_PATH):
+        image_path = os.path.join(ANCHOR_PATH, image)
+        augmented_images = create_augmented_pictures(cv2.imread(image_path))
+
+        for augmented_image in augmented_images:
+            cv2.imwrite(
+                os.path.join(ANCHOR_PATH, f'{uuid.uuid1()}.jpg'),
+                augmented_image.numpy(),
+            )
+
+    for image in os.listdir(POSITIVE_PATH):
+        image_path = os.path.join(POSITIVE_PATH, image)
+        augmented_images = create_augmented_pictures(cv2.imread(image_path))
+
+        for augmented_image in augmented_images:
+            cv2.imwrite(
+                os.path.join(POSITIVE_PATH, f'{uuid.uuid1()}.jpg'),
+                augmented_image.numpy(),
+            )
+
+
 def select_verification_files():
     if os.path.exists(APP_VERIFICATION_PATH):
         shutil.rmtree(APP_VERIFICATION_PATH)
@@ -80,4 +138,5 @@ def setup(device=0):
     create_directories()
     uncompress_negative_data()
     collect_pictures(device)
+    apply_data_augmentation()
     select_verification_files()
