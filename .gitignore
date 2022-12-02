@@ -18,6 +18,9 @@ ENV/
 env.bak/
 venv.bak/
 
-# Data files
+# Large or personal files
 data/
+app/
+train_checkpoints/
 lfw.tgz
+siamese_network.h5
