@@ -13,7 +13,7 @@ def create_face_recognition():
         train_data=train_data,
         test_data=test_data,
         model=siamese_network,
-        n_epochs=25
+        n_epochs=50
     )
 
 
