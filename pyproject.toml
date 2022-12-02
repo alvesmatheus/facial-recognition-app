@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "recognition"
+version = "0.1.0"
+description = "A face recognition toolkit based on Siamese Neural Networks."
+authors = ["alvesmatheus <contato.mathsalvs@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "recognition" }]
+
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+kivy = "^2.1.0"
+matplotlib = "^3.6.2"
+numpy = "^1.23.5"
+opencv-python = "^4.6.0.66"
+tensorflow = "^2.11.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
